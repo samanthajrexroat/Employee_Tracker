@@ -1,0 +1,25 @@
+{
+  "name": "employee_tracker",
+  "version": "1.0.0",
+  "description": "A content management system built with Node.js, Inquirer and MySQL that that manages a company's employee database from the command-line.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/samanthajrexroat/Employee_Tracker.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/samanthajrexroat/Employee_Tracker/issues"
+  },
+  "homepage": "https://github.com/samanthajrexroat/Employee_Tracker#readme",
+  "dependencies": {
+    "console.table": "^0.10.0",
+    "inquirer": "^8.2.1",
+    "mysql2": "^2.3.3"
+  }
+}
