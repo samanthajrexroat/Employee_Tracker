@@ -24,7 +24,6 @@ const userPrompt = () =>{
                 "Add Role", 
                 "View All Departments", 
                 "Add Department", 
-                "Exit Program"
             ],
         }
     ])
@@ -37,9 +36,24 @@ const userPrompt = () =>{
             case "Add Employee":
                 addEmployee()
                 break;
+            case "Update Employee Role":
+                updateEmployeeRole()
+                break;
             
             case "View All Roles":
                 viewAllRoles()
+                break;
+
+            case "Add Role":
+                addRole()
+                break;
+
+            case "View All Departments":
+                viewAllDepartments()
+                break;
+            
+            case "Add Department":
+                addDepartment()
                 break;
         }
     })
@@ -112,9 +126,45 @@ function addEmployee() {
             })
         })
     }) 
+};
+
+function updateEmployeeRole() {
+    DB.findAllEmployees()
+    .then(([rows]) => {
+        let roles = rows
+        const employeeChoices = roles.map(({ id, first_name, last_name  }) => ({
+            name: first_name + last_name,
+            value: id,
+        }));
+        inquirer.prompt([{
+            type: "list",
+            name: "employee_id",
+            message: "Which employee's role would you like to update?",
+            choices: employeeChoices
+        }])
+        .then((data) => {
+            const employeeId = data.employee_id
+            DB.findAllRoles()
+        .then(([rows]) => {
+            let roles = rows
+            const roleChoices = roles.map(({ id, title }) => ({
+                name: title,
+                value: id
+            }));
+            inquirer.prompt({
+                type: "list",
+                name: "role",
+                message: "What is the employee's role?",
+                choices: roleChoices
+            })
+            .then((data2) => {
+                DB.updateEmployeeRole(employeeId, data2.role)
+            })
+            .then(() => userPrompt());
+        }) 
+    })
+    })   
 }
-
-
 
 function viewAllRoles() {
     DB.findAllRoles()
@@ -123,4 +173,78 @@ function viewAllRoles() {
         console.table(roles)
     })
     .then(() => userPrompt())
+}
+
+function addRole(){
+    inquirer.prompt([
+        {
+            name: "new_role",
+            type: "input",
+            message: "What is the name of your new Role?"
+        },{
+            name: "salary",
+            type: "number",
+            message: "What is the role's salary?"
+        }
+    ])
+    .then((response) => {
+        let name = response.new_role
+        let salary = response.salary
+        DB.findAllDepartments(name)
+        .then(([rows]) => {
+            let departments = rows
+            const departmentChoices = departments.map(({ id, name }) => ({
+                name: name,
+                value: id
+            }));
+            inquirer.prompt({
+                type: "list",
+                name: "departments",
+                message: "What department does the role belong to?",
+                choices: departmentChoices
+            })
+            .then((data) => {
+                let newRole = {
+                    title: name,
+                    salary: salary,
+                    department_id: data.departments
+                }
+                DB.createRole(newRole)
+            })
+            .then(() => userPrompt());
+        })
+    })
+}
+
+function viewAllDepartments(){
+    DB.findAllDepartments()
+    .then(([rows]) => {
+        let departments = rows
+        console.table(departments)
+    })
+    .then(() => userPrompt())
+}
+
+function addDepartment(){
+    inquirer.prompt([
+        {
+            name: "new_department",
+            type: "input",
+            message: "What is the name of your new Department?"
+        }
+    ])
+    .then((response) => {
+        let name = response.new_department
+
+        let newDepartment = {
+            name: name
+        }
+
+        DB.createDepartment(newDepartment)
+        .then(([rows]) => {
+            let departments = rows
+            console.table(departments)
+        })
+        .then(() => userPrompt())
+    })
 }
